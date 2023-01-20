@@ -65,31 +65,4 @@ public class AddItemUseCase implements SaveItem {
                 })
         );
     }
-
-    //@Override
-    public Mono<OrderDTO> apply2(ItemDTO itemDTO) {
-        Objects.requireNonNull(itemDTO.getOrderId(), "Id of the answer is required");
-        return findOrderByIdUseCase.apply(itemDTO.getOrderId()).flatMap(order ->
-                itemRepository.save(mapperUtils.mapperToItem().apply(itemDTO))
-                        .map(item -> {
-                            productRepository.findById(itemDTO.getIdProduct()).map(selecteProduct -> {
-                                if((selecteProduct.getInInventory() - itemDTO.getQuantity()) >= 0){
-
-                                    selecteProduct.setInInventory(selecteProduct.getInInventory() - itemDTO.getQuantity());
-
-                                    updateProductUseCase.apply(mapperUtils.mapEntityToProduct().apply(selecteProduct));
-
-                                    order.getProducts().add(itemDTO);
-
-                                    return order;
-
-                                } else {
-                                    return null;
-                                }
-
-                            });
-                            return order;
-                        })
-        );
-    }
 }

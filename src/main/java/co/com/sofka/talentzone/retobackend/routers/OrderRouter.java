@@ -94,7 +94,7 @@ public class OrderRouter {
     @Bean
     public RouterFunction<ServerResponse> deleteItem(DeleteItemUseCase deleteItemUseCase) {
         return route(
-                DELETE("/orders/deleteItem/{id}").and(accept(MediaType.APPLICATION_JSON)),
+                DELETE("/orders/delete-item/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> ServerResponse.accepted()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(deleteItemUseCase.apply(request.pathVariable("id")), Void.class))
