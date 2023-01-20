@@ -1,6 +1,8 @@
 package co.com.sofka.talentzone.retobackend.routers;
 
+import co.com.sofka.talentzone.retobackend.model.ItemDTO;
 import co.com.sofka.talentzone.retobackend.model.OrderDTO;
+import co.com.sofka.talentzone.retobackend.usecases.item.AddItemUseCase;
 import co.com.sofka.talentzone.retobackend.usecases.item.DeleteItemUseCase;
 import co.com.sofka.talentzone.retobackend.usecases.order.*;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +22,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class OrderRouter {
 
     @Bean
-    public RouterFunction<ServerResponse> getAll(GetAllOrdersUseCase getAllOrdersUseCase) {
+    public RouterFunction<ServerResponse> getAllOrders(GetAllOrdersUseCase getAllOrdersUseCase) {
         return route(GET("/orders"),
                 request -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -29,7 +31,7 @@ public class OrderRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> getById(FindOrderByIdUseCase findOrderByIdUseCase) {
+    public RouterFunction<ServerResponse> getOrderById(FindOrderByIdUseCase findOrderByIdUseCase) {
         return route(
                 GET("/orders/getById/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> ServerResponse.ok()
@@ -42,7 +44,7 @@ public class OrderRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> create(CreateOrderUseCase createOrderUseCase) {
+    public RouterFunction<ServerResponse> createOrder(CreateOrderUseCase createOrderUseCase) {
         Function<OrderDTO, Mono<ServerResponse>> executor = orderDTO ->  createOrderUseCase.apply(orderDTO)
                 .flatMap(result -> ServerResponse.ok()
                         .contentType(MediaType.TEXT_PLAIN)
@@ -55,7 +57,7 @@ public class OrderRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> update(UpdateOrderUseCase updateOrderUseCase) {
+    public RouterFunction<ServerResponse> updateOrder(UpdateOrderUseCase updateOrderUseCase) {
         Function<OrderDTO, Mono<ServerResponse>> executor = orderDTO ->  updateOrderUseCase.apply(orderDTO)
                 .flatMap(result -> ServerResponse.ok()
                         .contentType(MediaType.TEXT_PLAIN)
@@ -68,7 +70,19 @@ public class OrderRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> delete(DeleteOrderUseCase deleteOrderUseCase) {
+    public RouterFunction<ServerResponse> addItem(AddItemUseCase addItemUseCase) {
+        return route(POST("/orders/add-item").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(ItemDTO.class)
+                        .flatMap(addItemDTO -> addItemUseCase.apply(addItemDTO)
+                                .flatMap(result -> ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result))
+                        )
+        );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> deleteOrder(DeleteOrderUseCase deleteOrderUseCase) {
         return route(
                 DELETE("/orders/delete/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> ServerResponse.accepted()

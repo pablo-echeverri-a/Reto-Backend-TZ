@@ -26,13 +26,12 @@ public class OrderDTO {
         this.clientName = clientName;
     }
 
-    public OrderDTO(String id, Date date, String idType, String identification, String clientName, List<ItemDTO> products) {
+    public OrderDTO(String id, String idType, String identification, String clientName) {
         this.id = id;
-        this.date = date;
+        this.date = new Date();
         this.idType = idType;
         this.identification = identification;
         this.clientName = clientName;
-        this.products = products;
     }
 
     public String getId() {

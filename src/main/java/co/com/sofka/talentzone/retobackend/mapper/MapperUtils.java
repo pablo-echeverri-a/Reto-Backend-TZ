@@ -59,6 +59,7 @@ public class MapperUtils {
 
     public Function<Order, OrderDTO> mapEntityToOrder() {
         return entity -> new OrderDTO(
+                entity.getId(),
                 entity.getIdType(),
                 entity.getIdentification(),
                 entity.getClientName()
