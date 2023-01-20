@@ -16,7 +16,7 @@ public class Order {
     String idType;
     String identification;
     String clientName;
-    @DBRef
+    //@DBRef
     List<Item> products;
 
     public String getId() {
