@@ -6,12 +6,20 @@ import co.com.sofka.talentzone.retobackend.document.Product;
 import co.com.sofka.talentzone.retobackend.model.ItemDTO;
 import co.com.sofka.talentzone.retobackend.model.OrderDTO;
 import co.com.sofka.talentzone.retobackend.model.ProductDTO;
+import co.com.sofka.talentzone.retobackend.repositories.ItemRepository;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
 @Component
 public class MapperUtils {
+
+    private final ItemRepository itemRepository;
+
+    public MapperUtils(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 
     public Function<ProductDTO, Product> mapperToProduct() {
         return updateProduct -> {
@@ -72,5 +80,18 @@ public class MapperUtils {
                 entity.getQuantity(),
                 entity.getOrderId()
         );
+    }
+
+    public Function<OrderDTO, Mono<OrderDTO>> mapOrderAggregate() {
+        return orderDTO ->
+                Mono.just(orderDTO).zipWith(
+                        itemRepository.findAllByOrderId(orderDTO.getId())
+                                .map(mapEntityToItem())
+                                .collectList(),
+                        (order, items) -> {
+                            order.setProducts(items);
+                            return order;
+                        }
+                );
     }
 }

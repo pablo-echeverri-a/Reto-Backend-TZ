@@ -30,19 +30,7 @@ public class FindOrderByIdUseCase implements Function<String, Mono<OrderDTO>> {
         Objects.requireNonNull(id, "Order Id is required");
         return orderRepository.findById(id)
                 .map(mapperUtils.mapEntityToOrder())
-                .flatMap(mapOrderAggregate());
+                .flatMap(mapperUtils.mapOrderAggregate());
     }
 
-    private Function<OrderDTO, Mono<OrderDTO>> mapOrderAggregate() {
-        return orderDTO ->
-                Mono.just(orderDTO).zipWith(
-                        itemRepository.findAllByOrderId(orderDTO.getId())
-                                .map(mapperUtils.mapEntityToItem())
-                                .collectList(),
-                        (order, items) -> {
-                            order.setProducts(items);
-                            return order;
-                        }
-                );
-    }
 }

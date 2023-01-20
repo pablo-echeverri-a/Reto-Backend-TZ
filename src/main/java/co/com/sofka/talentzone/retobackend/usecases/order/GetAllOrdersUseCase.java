@@ -24,6 +24,8 @@ public class GetAllOrdersUseCase implements Supplier<Flux<OrderDTO>> {
 
     @Override
     public Flux<OrderDTO> get() {
-        return orderRepository.findAll().map(mapperUtils.mapEntityToOrder());
+        return orderRepository.findAll()
+                .map(mapperUtils.mapEntityToOrder())
+                .flatMap(mapperUtils.mapOrderAggregate());
     }
 }
